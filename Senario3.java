@@ -144,73 +144,31 @@ public class Senario3 {
 			//Fourth step: Create VMs and Cloudlets and send them to broker
 			vmlist = createVM(brokerId,4); //creating vms
 			cloudletList = createCloudlet(brokerId,36); // creating cloudlets            
-                        
-//                        int random;
-                        //assigning a random priority to tasks
-//                        for(int i=0;i<36;i++){
-//                        
-//                        random=(int)(Math.random() * 4) + 1;
-//                        cloudletList.get(i).setPr(random);
-//                        }
-			LinkedList<Cloudlet> list1 = new LinkedList<Cloudlet>();
-			LinkedList<Cloudlet> list2 = new LinkedList<Cloudlet>();
-			LinkedList<Cloudlet> list3 = new LinkedList<Cloudlet>();
-			LinkedList<Cloudlet> list4 = new LinkedList<Cloudlet>();
-			LinkedList<Cloudlet> listT = new LinkedList<Cloudlet>();
-                        List<Integer> pr1=new ArrayList<Integer>();  
-                        List<Integer> pr2=new ArrayList<Integer>(); 
-                        List<Integer> pr3=new ArrayList<Integer>(); 
-                        List<Integer> pr4=new ArrayList<Integer>();
-                        List<Integer> prTotal=new ArrayList<Integer>(); 
-                        for( int i=0; i<36; i++) {
-                        	
-                        	if (cloudletList.get(i).getPriority()== 1) {
-                        		list1.add(cloudletList.get(i));
-                        		System.out.println("@@PR1: " + i);
-                        	}
-                        	else if (cloudletList.get(i).getPr() == 2) {
-                        		list2.add(cloudletList.get(i));
-                        		
-                        	}
-                        	else if (cloudletList.get(i).getPr() == 3) {
-                        		list3.add(cloudletList.get(i));
-                        		
-                        	}
-                        	else {
-                        		list4.add(cloudletList.get(i));
-                        		
-                        	}
-                        }
-                        
-                        prTotal.addAll(pr1);
-                        prTotal.addAll(pr2);
-                        prTotal.addAll(pr3);
-                        prTotal.addAll(pr4);
-                        listT.addAll(list1);
-                        listT.addAll(list2);
-                        listT.addAll(list3);
-                        listT.addAll(list4);
-                        for (int i = 0 ; i < listT.size() ; i++) {
-            				for (int j = i+1 ; j < listT.size(); j++) {
-            					Cloudlet c = listT.get(i);
-            					Cloudlet next = listT.get(j);
+
+			
+                        for (int i = 0 ; i < cloudletList.size() ; i++) {
+            				for (int j = i+1 ; j < cloudletList.size(); j++) {
+            					Cloudlet c = cloudletList.get(i);
+            					Cloudlet next = cloudletList.get(j);
             					if (c.getCloudletLength() < next.getCloudletLength()) {
             						Cloudlet temp = c;
-            						listT.set(i, next);
-            						listT.set(j, temp);
+            						cloudletList.set(i, next);
+            						cloudletList.set(j, temp);
             					}
             				}
             			}
                         
              
 			broker.submitVmList(vmlist);
-            broker.submitCloudletList(listT);
+            broker.submitCloudletList(cloudletList);
+            
+            
 // weighted Round Robin Algoritm 
                                     
                            
            int[] vmWeights = {1, 2, 4, 6}; // Weights corresponding to VMs (1 is the weakest, 4 is the strongest)
                            
-           for (int j = 0; j < listT.size(); j++) {
+           for (int j = 0; j < cloudletList.size(); j++) {
         	   int maxWeight = Arrays.stream(vmWeights).max().getAsInt();
                System.out.println("max weight: " + maxWeight );                             
                int maxIndex = 3;
@@ -220,7 +178,7 @@ public class Senario3 {
                    }
                System.out.println("max index: " + maxIndex );
                                
-               broker.bindCloudletToVm(listT.get(j).getCloudletId(), maxIndex);
+               broker.bindCloudletToVm(cloudletList.get(j).getCloudletId(), maxIndex);
                vmWeights[maxIndex]--;
                if (vmWeights[maxIndex] == 0) {
             	   maxIndex = (maxIndex + 1) % 4;
